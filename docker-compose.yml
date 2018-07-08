@@ -1,0 +1,29 @@
+version: '2'
+services:
+  db:
+    image: mariadb:latest
+    environment:
+      - MYSQL_DATABASE=wp_istt
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_USER=istt_wp
+      - MYSQL_PASSWORD=istt@wp
+  php:
+    depends_on:
+      - db
+    image: nguyendinhtrung141/php:fpm-alpine
+    volumes:
+      - "./wordpress:/var/www/html"
+      - "./php.ini:/usr/local/etc/php/conf.d/php.ini"
+    links:
+      - db
+  nginx:
+    depends_on:
+      - php
+    ports:
+      - "28000:80"
+    image: nguyendinhtrung141/docker-nginx
+    volumes:
+      - "./wordpress:/var/www/html:ro"
+      - "./nginx:/etc/nginx/conf.d"
+    links:
+      - php
